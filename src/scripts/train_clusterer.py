@@ -7,6 +7,8 @@ import pandas as pd
 import pickle
 import torch
 import tqdm
+import random
+import os
 from itertools import chain
 from pathlib import Path
 from sklearn.feature_extraction import text
@@ -19,8 +21,26 @@ from tqdm.auto import tqdm
 from typing import Dict
 from kmeans_pytorch import KMeans as BalancedKMeans
 from datasets import load_dataset
-import random
 
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+from sklearn.metrics import silhouette_score
+from sklearn.metrics import davies_bouldin_score
+from umap import UMAP
+import seaborn as sns
+
+
+# Add to your main function
+def set_random_seeds(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+
+# Call before training
+set_random_seeds(42)
 
 def load_model(path_to_model: Path):
     with open(path_to_model, 'rb') as f:
@@ -138,6 +158,7 @@ def train_kmeans(vecs, n_clusters, path_to_kmeans, balanced=False):
     return kmeans
 
 
+
 def main(dataset_name="allenai/tulu-3-sft-mixture",
          model='tfidf',
          n_clusters=16,
@@ -161,22 +182,6 @@ def main(dataset_name="allenai/tulu-3-sft-mixture",
     return vectorizer, kmeans
 
 
-def eval(vectorizer, kmeans, dataset_name="allenai/tulu-3-sft-mixture"):
-    top_terms = get_top_terms(vectorizer, kmeans)
-    
-    # Load a sample for evaluation
-    vecs, metadata = vectorize_tulu_dataset(vectorizer, dataset_name, sample_size=10000)
-    
-    # Predict clusters
-    if torch.cuda.is_available():
-        device = torch.device('cuda')
-    else:
-        device = torch.device('cpu')
-    
-    metadata['cluster'] = kmeans.predict(torch.from_numpy(vecs).to(device)).cpu().numpy()
-    
-    return metadata, top_terms
-
 
 if __name__ == '__main__':
 
@@ -186,24 +191,18 @@ if __name__ == '__main__':
     parser.add_argument('--num-clusters', required=True, type=int)
     parser.add_argument('--balanced', action='store_true')
     parser.add_argument('--output-dir', required=True, type=Path)
-    parser.add_argument('--eval-only', action='store_true')
     parser.add_argument('--sample-size', type=int, default=20000, 
                        help='Number of samples to use for training')
 
     args = parser.parse_args()
 
-    if not args.eval_only:
-        vectorizer, kmeans = main(dataset_name=args.dataset_name,
+    vectorizer, kmeans = main(dataset_name=args.dataset_name,
                                 n_clusters=args.num_clusters,
                                 balanced=args.balanced,
                                 output_dir=args.output_dir,
                                 kmeans_only=False,
                                 sample_size=args.sample_size)
+
+
+
     
-    path_to_vectorizer = args.output_dir / "tfidf.pkl"
-    path_to_kmeans = args.output_dir / "kmeans.pkl"
-    
-    vectorizer = load_model(path_to_vectorizer)
-    kmeans = load_model(path_to_kmeans)
-    metadata, top_terms = eval(vectorizer, kmeans, args.dataset_name)
-    print(top_terms)

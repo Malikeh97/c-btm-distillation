@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=test_train_clusterer
+#SBATCH --job-name=test_analyze_clusters
 #SBATCH --output=/home/ehghaghi/scratch/ehghaghi/cbtm_runs/run_logs/%x_%j.out
 #SBATCH --error=/home/ehghaghi/scratch/ehghaghi/cbtm_runs/run_logs/%x_%j.err
 #SBATCH --partition=gpubase_l40s_b3
@@ -37,9 +37,9 @@ export OUTPUT_DIR="$SCRATCH/results"
 # Experiment variables
 # ----------------------------
 
-NUM_CLUSTERS=50
+NUM_CLUSTERS=25
 DATASET="allenai/tulu-3-sft-mixture"
-SAMPLE_SIZE=917
+SAMPLE_SIZE=10000
 KMEANS_DIR="$SCRATCH/clusters"
 
 # ----------------------------
@@ -47,10 +47,9 @@ KMEANS_DIR="$SCRATCH/clusters"
 # ----------------------------
 
 echo "Running clustering with ${NUM_CLUSTERS} clusters on ${SAMPLE_SIZE} samples..."
-python -u -m train_clusterer \
+python -u -m analyze_clusters \
   --dataset-name "${DATASET}" \
   --num-clusters "${NUM_CLUSTERS}" \
-  --balanced \
   --sample-size "${SAMPLE_SIZE}" \
   --output-dir "${KMEANS_DIR}/${DATASET}/${NUM_CLUSTERS}/" 
 
