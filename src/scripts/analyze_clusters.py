@@ -383,7 +383,7 @@ def analyze_silhouette_tulu(
             print(f"⚠️ Only {len(np.unique(labels))} cluster(s); skipping")
             continue
 
-        score = silhouette_score(X, labels, metric='cosine')  # 💡 Mean silhouette score :contentReference[oaicite:6]{index=6}
+        score = silhouette_score(X, labels, metric='euclidean')  # 💡 Mean silhouette score :contentReference[oaicite:6]{index=6}
         print(f"✅ k={k} → silhouette score = {score:.4f}")
 
         ks_done.append(k)
@@ -493,7 +493,163 @@ def analyze_davies_bouldin_tulu(
 
     return ks_done, scores
 
+def analyze_elbow_tulu(
+    base_path: str,
+    dataset_name: str,
+    sample_size: int = 10000,
+    ks: list[int] = [2, 4, 6, 10, 14, 19],
+    plot_filename: str = 'tulu_elbow_scores.png',
+    save_plot: bool = True
+) -> tuple[list[int], list[float]]:
+    """
+    Loads TF-IDF and KMeans models saved per k, vectorizes data, calculates WCSS (inertia),
+    and plots elbow curve across different k values.
+    
+    Args:
+        base_path: Directory containing k subdirectories with pickle files
+        dataset_name: Name of dataset to load (e.g., 'allenai/tulu-3-sft-mixture')
+        sample_size: Number of samples to use for analysis
+        ks: List of k values to analyze
+        plot_filename: Output filename for the plot
+        save_plot: Whether to save the plot to file
+    
+    Returns:
+        Tuple of (k_values_processed, wcss_scores)
+    """
+    ks_done, wcss_scores = [], []
 
+    for k in ks:
+        k_dir = os.path.join(base_path, str(k))
+        tfidf_pkl = os.path.join(k_dir, 'tfidf.pkl')
+        kmeans_pkl = os.path.join(k_dir, 'kmeans.pkl')
+        
+        if not os.path.exists(tfidf_pkl) or not os.path.exists(kmeans_pkl):
+            print(f"⚠️ Skipping k={k}: missing pickle(s)")
+            continue
+
+        print(f"\n🔍 Processing k={k}")
+        
+        # Load models
+        with open(tfidf_pkl, 'rb') as f:
+            tfidf = pickle.load(f)
+        with open(kmeans_pkl, 'rb') as f:
+            kmeans = pickle.load(f)
+
+        # Vectorize data using the k-specific TF-IDF vectorizer
+        X, _ = vectorize_tulu_dataset(tfidf, dataset_name, sample_size=sample_size)
+        X = X.toarray() if hasattr(X, 'toarray') else X
+        X = X.astype(np.float64)
+
+        # Get cluster labels
+        if hasattr(kmeans, 'labels_') and len(kmeans.labels_) == X.shape[0]:
+            labels = kmeans.labels_
+        else:
+            # Convert NumPy array to PyTorch tensor if needed
+            if hasattr(kmeans, 'predict') and 'torch' in str(type(kmeans)):
+                X_tensor = torch.from_numpy(X).float()
+                labels = kmeans.predict(X_tensor)
+            else:
+                labels = kmeans.predict(X)
+
+        # Check for valid clustering
+        if len(np.unique(labels)) < 2:
+            print(f"⚠️ Only {len(np.unique(labels))} cluster(s); skipping")
+            continue
+
+        # Calculate WCSS (Within-Cluster Sum of Squares)
+        # This is the inertia - sum of squared distances to centroids
+        if hasattr(kmeans, 'inertia_'):
+            wcss = kmeans.inertia_
+        else:
+            # Calculate manually if inertia not available
+            wcss = 0
+            unique_labels = np.unique(labels)
+            for label in unique_labels:
+                cluster_points = X[labels == label]
+                if len(cluster_points) > 0:
+                    # Get centroid for this cluster
+                    if hasattr(kmeans, 'cluster_centers_'):
+                        centroid = kmeans.cluster_centers_[label]
+                    else:
+                        centroid = np.mean(cluster_points, axis=0)
+                    
+                    # Sum of squared distances to centroid
+                    distances = np.sum((cluster_points - centroid) ** 2, axis=1)
+                    wcss += np.sum(distances)
+
+        print(f"✅ k={k} → WCSS = {wcss:.2f}")
+
+        ks_done.append(k)
+        wcss_scores.append(wcss)
+
+    if not wcss_scores:
+        print("❌ No valid WCSS scores computed.")
+        return ks_done, wcss_scores
+
+    # Calculate elbow score (optional - rate of change in WCSS)
+    elbow_scores = []
+    if len(wcss_scores) > 2:
+        for i in range(1, len(wcss_scores) - 1):
+            # Calculate second derivative approximation
+            elbow_score = wcss_scores[i-1] - 2*wcss_scores[i] + wcss_scores[i+1]
+            elbow_scores.append(elbow_score)
+        
+        # Find the elbow point (maximum second derivative)
+        if elbow_scores:
+            elbow_idx = np.argmax(elbow_scores) + 1  # +1 because we start from index 1
+            elbow_k = ks_done[elbow_idx]
+        else:
+            elbow_k = ks_done[0]
+    else:
+        elbow_k = ks_done[0] if ks_done else None
+
+    # Plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(ks_done, wcss_scores, 'o-', label='WCSS', color='tab:red', linewidth=2, markersize=8)
+    
+    # Mark the elbow point if found
+    if elbow_k is not None and len(wcss_scores) > 2:
+        elbow_wcss = wcss_scores[ks_done.index(elbow_k)]
+        plt.plot(elbow_k, elbow_wcss, 'g*', markersize=15, label=f'Elbow: k={elbow_k}')
+
+    plt.xticks(ks_done)
+    plt.xlabel('Number of Clusters (k)')
+    plt.ylabel('Within-Cluster Sum of Squares (WCSS)')
+    plt.title('Elbow Method: WCSS vs k for Tulu Dataset')
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+
+    # Add annotation about elbow interpretation
+    if len(ks_done) > 1:
+        plt.text(0.02, 0.98, 
+                'Look for the "elbow" - point where\nWCSS reduction starts to level off', 
+                transform=plt.gca().transAxes, 
+                verticalalignment='top',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+
+    if save_plot:
+        plt.savefig(plot_filename, dpi=300, bbox_inches='tight')
+        print(f"📈 Plot saved to {plot_filename}")
+    plt.show()
+
+    # Print summary
+    print(f"\n📊 ELBOW METHOD SUMMARY:")
+    print(f"k values tested: {ks_done}")
+    print(f"WCSS scores: {[f'{score:.1f}' for score in wcss_scores]}")
+    if elbow_k is not None and len(wcss_scores) > 2:
+        print(f"Suggested elbow point: k={elbow_k}")
+    else:
+        print("Elbow point detection requires more data points")
+    
+    # Calculate percentage reduction between consecutive k values
+    if len(wcss_scores) > 1:
+        print(f"\nWCSS Reduction per k increase:")
+        for i in range(1, len(wcss_scores)):
+            reduction = ((wcss_scores[i-1] - wcss_scores[i]) / wcss_scores[i-1]) * 100
+            print(f"k={ks_done[i-1]} → k={ks_done[i]}: {reduction:.1f}% reduction")
+
+    return ks_done, wcss_scores
 
 
 if __name__ == '__main__':
@@ -518,6 +674,9 @@ if __name__ == '__main__':
 
     # Load a sample for evaluation
     vecs, metadata = vectorize_tulu_dataset(vectorizer, args.dataset_name, sample_size=args.sample_size)
+
+    print("vecs.shape", vecs.shape)
+
 
     # Predict clusters
     if torch.cuda.is_available():
@@ -564,12 +723,20 @@ if __name__ == '__main__':
     #                     cluster_colors=custom_colors)
 
 
+    analyze_elbow_tulu(
+        base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
+         dataset_name='allenai/tulu-3-sft-mixture',
+         sample_size=10000,
+         ks=[2, 4, 6, 10, 14, 19, 25, 30, 50, 100],
+         plot_filename=args.output_dir / 'tulu_elbow_scores.png',
+         save_plot=True)
+
     analyze_silhouette_tulu(
         base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
         dataset_name='allenai/tulu-3-sft-mixture',
         sample_size=10000,
-        ks=[2, 4, 6, 10, 14, 19, 25, 50],
-        plot_filename=args.output_dir / f'tulu_silhouette_scores_{args.num_clusters}.png',
+        ks=[2, 4, 6, 10, 14, 19, 25, 30, 50, 100],
+        plot_filename=args.output_dir / 'tulu_silhouette_scores.png',
         save_plot=True)
 
 
@@ -577,8 +744,8 @@ if __name__ == '__main__':
         base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
          dataset_name='allenai/tulu-3-sft-mixture',
          sample_size=10000,
-         ks=[2, 4, 6, 10, 14, 19, 25, 50],
-         plot_filename=args.output_dir / f'tulu_davies_bouldin_scores_{args.num_clusters}.png',
+         ks=[2, 4, 6, 10, 14, 19, 25, 30, 50, 100],
+         plot_filename=args.output_dir / 'tulu_davies_bouldin_scores.png',
          save_plot=True)
 
 
