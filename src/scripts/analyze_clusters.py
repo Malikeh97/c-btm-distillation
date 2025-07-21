@@ -30,7 +30,7 @@ from umap import UMAP
 import seaborn as sns
 
 
-def set_random_seeds(seed=42):
+def set_random_seeds(seed=1997):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -39,7 +39,7 @@ def set_random_seeds(seed=42):
         torch.cuda.manual_seed_all(seed)
 
 # Call before training
-set_random_seeds(42)
+set_random_seeds(1997)
 
 def load_model(path_to_model: Path):
     with open(path_to_model, 'rb') as f:
@@ -168,7 +168,7 @@ def visualize_clusters_2d(vecs, cluster_labels, n_clusters, output_dir, method='
     # Create plot
     plt.figure(figsize=(12, 8))
     scatter = plt.scatter(vecs_2d[:, 0], vecs_2d[:, 1], 
-                         c=cluster_labels, cmap='tab10', alpha=0.7)
+                         c=cluster_labels, cmap='viridis', alpha=0.7)
     plt.colorbar(scatter)
     plt.title(f'Cluster Visualization ({method.upper()})')
     plt.xlabel('Dimension 1')
@@ -591,7 +591,19 @@ def analyze_elbow_tulu(
     if len(wcss_scores) > 2:
         for i in range(1, len(wcss_scores) - 1):
             # Calculate second derivative approximation
-            elbow_score = wcss_scores[i-1] - 2*wcss_scores[i] + wcss_scores[i+1]
+            # Get the actual k values and step sizes
+            k_prev, k_curr, k_next = ks[i-1], ks[i], ks[i+1]
+            step1 = k_curr - k_prev
+            step2 = k_next - k_curr
+            
+            # Calculate normalized second derivative
+            slope1 = (wcss_scores[i] - wcss_scores[i-1]) / step1
+            slope2 = (wcss_scores[i+1] - wcss_scores[i]) / step2
+            
+            # Second derivative normalized by average step size
+            avg_step = (step1 + step2) / 2
+            elbow_score = (slope2 - slope1) / avg_step
+            # elbow_score = wcss_scores[i-1] - 2*wcss_scores[i] + wcss_scores[i+1]
             elbow_scores.append(elbow_score)
         
         # Find the elbow point (maximum second derivative)
@@ -727,7 +739,7 @@ if __name__ == '__main__':
         base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
          dataset_name='allenai/tulu-3-sft-mixture',
          sample_size=10000,
-         ks=[2, 4, 6, 10, 14, 19, 25, 30, 50, 100],
+         ks=[2, 4, 6, 8, 10, 12, 14, 16, 18, 19, 20, 25, 30, 35, 40, 45, 50, 75, 100],
          plot_filename=args.output_dir / 'tulu_elbow_scores.png',
          save_plot=True)
 
@@ -735,7 +747,7 @@ if __name__ == '__main__':
         base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
         dataset_name='allenai/tulu-3-sft-mixture',
         sample_size=10000,
-        ks=[2, 4, 6, 10, 14, 19, 25, 30, 50, 100],
+        ks=[2, 4, 6, 8, 10, 12, 14, 16, 18, 19, 20, 25, 30, 35, 40, 45, 50, 75, 100],
         plot_filename=args.output_dir / 'tulu_silhouette_scores.png',
         save_plot=True)
 
@@ -744,7 +756,7 @@ if __name__ == '__main__':
         base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
          dataset_name='allenai/tulu-3-sft-mixture',
          sample_size=10000,
-         ks=[2, 4, 6, 10, 14, 19, 25, 30, 50, 100],
+         ks=[2, 4, 6, 8, 10, 12, 14, 16, 18, 19, 20, 25, 30, 35, 40, 45, 50, 75, 100],
          plot_filename=args.output_dir / 'tulu_davies_bouldin_scores.png',
          save_plot=True)
 
