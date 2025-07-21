@@ -568,8 +568,8 @@ if __name__ == '__main__':
         base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
         dataset_name='allenai/tulu-3-sft-mixture',
         sample_size=10000,
-        ks=[2, 4, 6, 10, 14, 19],
-        plot_filename='tulu_silhouette_scores.png',
+        ks=[2, 4, 6, 10, 14, 19, 25, 50],
+        plot_filename=args.output_dir / f'tulu_silhouette_scores_{args.num_clusters}.png',
         save_plot=True)
 
 
@@ -577,8 +577,8 @@ if __name__ == '__main__':
         base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
          dataset_name='allenai/tulu-3-sft-mixture',
          sample_size=10000,
-         ks=[2, 4, 6, 10, 14, 19],
-         plot_filename='tulu_davies_bouldin_scores.png',
+         ks=[2, 4, 6, 10, 14, 19, 25, 50],
+         plot_filename=args.output_dir / f'tulu_davies_bouldin_scores_{args.num_clusters}.png',
          save_plot=True)
 
 
