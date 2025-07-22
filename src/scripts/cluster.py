@@ -22,6 +22,8 @@ from tqdm.auto import tqdm
 from typing import Dict
 from kmeans_pytorch import KMeans as BalancedKMeans
 from datasets import load_dataset
+from datasets import Dataset, DatasetDict
+from huggingface_hub import HfApi
 
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
@@ -321,7 +323,7 @@ tags:
 size_categories:
 - 10K<n<100K
 configs:
-{chr(10).join(f"- {name}" for name in config_names)}
+{chr(10).join(f"- config_name: {name}" for name in config_names)}
 ---
 
 # {repo_name.title().replace('-', ' ')} Multi-Domain Dataset
@@ -529,14 +531,14 @@ if __name__ == '__main__':
     # Define cluster-to-domain mapping
     # TODO: Update this mapping based on your manual cluster analysis
     cluster_names_mapping = {
-        0: "Programming & Code Development",     # Python functions, arrays, string manipulation, data processing
-        1: "Q&A & Logical Reasoning",          # Multiple choice questions, premise-hypothesis evaluation, logical reasoning
-        2: "Creative Writing & General Tasks",  # Story writing, critiques, analysis tasks, general assistance
-        3: "Multilingual & Translation",       # Non-English content, language identification, translation tasks
-        4: "Safety & Harmful Content",         # Safety-related prompts, harmful requests, hypothetical scenarios
-        5: "Word Problems & Arithmetic",       # Story-based math problems, cost calculations, practical scenarios
-        6: "Non-English Mathematics",          # Mathematical content in non-Latin scripts (Tamil, Russian, etc.)
-        7: "Advanced Mathematics & Modeling"   # Complex mathematical problems, optimization, quantitative analysis
+    0: "Programming & Code Development",     # Python functions, arrays, string manipulation, data processing
+    1: "Q&A & Logical Reasoning",          # Multiple choice questions, premise-hypothesis evaluation, logical reasoning
+    2: "Creative Writing & General Tasks",  # Story writing, critiques, analysis tasks, general assistance
+    3: "Multilingual & Translation",       # Non-English content, language identification, translation tasks
+    4: "Safety & Harmful Content",         # Safety-related prompts, harmful requests, hypothetical scenarios
+    5: "Word Problems & Arithmetic",       # Story-based math problems, cost calculations, practical scenarios
+    6: "Non-English Mathematics",          # Mathematical content in non-Latin scripts (Tamil, Russian, etc.)
+    7: "Advanced Mathematics & Modeling"   # Complex mathematical problems, optimization, quantitative analysis
     }
     
     print(f"\n🏷️ Domain Mapping:")

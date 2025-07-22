@@ -40,7 +40,7 @@ DATASET="allenai/tulu-3-sft-mixture"
 NUM_CLUSTER=8
 HF_USERNAME="Malikeh1375"
 REPO_NAME="clustered_tulu_3"
-SAMPLE_SIZE=10000
+SAMPLE_SIZE=939343 #FULL DATASET
 MODLE_PATH="$SCRATCH/clusters/allenai/tulu-3-sft-mixture/$NUM_CLUSTER"
 TEST_SIZE=0.2
 
