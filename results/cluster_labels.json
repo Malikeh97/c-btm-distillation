@@ -390,6 +390,138 @@ custom_colors = {
         125: '#98FB98', 126: '#90EE90', 127: '#00FA9A'
     }
 
+},
+"128": cluster_names = {
+    0: "Task Definition & NLP Instructions",         # Task definitions, language processing instructions
+    1: "Reasoning & Multiple Choice Questions",      # Logic, reasoning, stream of consciousness
+    2: "Short Story & Creative Writing",            # Creative narratives, character-driven stories
+    3: "Language Translation Tasks",                # Translation between specific language pairs
+    4: "Casual Conversation & Mixed Content",       # General chat, literature club scenarios
+    5: "Alex Character Math Problems",              # Math word problems featuring Alex
+    6: "Malagasy Language Content",                 # Malagasy language questions and content
+    7: "Social Media & Digital Marketing",          # Social media posts, digital engagement
+    8: "Language Identification & Detection",       # Language recognition, NLP tasks
+    9: "Blog Writing & Article Creation",           # Blog posts, essays, article writing
+    10: "Business Revenue & Financial Analysis",    # Company finances, tax, business growth
+    11: "Matrix Mathematics & Vector Operations",   # Linear algebra, mathematical modeling
+    12: "Performance Metrics & Scoring",            # Score analysis, performance evaluation
+    13: "Sinhala Language Content",                 # Sinhala script and language tasks
+    14: "Mathematical Sequences & Series",          # Fibonacci, arithmetic sequences, series
+    15: "General Information & AI Assistance",      # Broad help requests, AI discussions
+    16: "Solar Energy & Scientific Applications",   # Energy calculations, scientific problems
+    17: "String Processing & Text Functions",       # String manipulation, text processing
+    18: "Array Operations & Numerical Computing",   # Array processing, numerical algorithms
+    19: "Italian & Yoruba Language Mix",           # Italian and African languages
+    20: "Differential Equations & Greek Symbols",   # Advanced calculus, Greek mathematical notation
+    21: "Indonesian & Malaysian Languages",         # Indonesian, Malaysian, Burmese content
+    22: "Emily Character Arithmetic",              # Basic math problems with Emily
+    23: "Machine Learning & AI Development",        # ML models, datasets, AI systems
+    24: "Geometry & Spatial Calculations",         # Geometric shapes, area, spatial reasoning
+    25: "Etsy Product Titles & Art Descriptions",   # Product descriptions, art titles
+    26: "Python List & Dictionary Processing",      # Python data structures, list operations
+    27: "Budget Optimization & Resource Planning",  # Financial optimization, resource allocation
+    28: "Historical Events & Factual Questions",    # History questions, factual inquiries
+    29: "Advanced Trigonometry & Functions",        # Complex mathematical functions
+    30: "Premise-Hypothesis Logic Testing",         # Logical reasoning, premise evaluation
+    31: "Step-by-Step Reasoning & Explanations",    # Detailed reasoning processes
+    32: "Content Generation & Mixed Topics",        # General content creation, varied subjects
+    33: "Paragraph Writing & Text Formatting",      # Structured writing, paragraph construction
+    34: "Mixed Non-English Scripts",               # Various South Asian languages
+    35: "Programming Class & Object Design",        # OOP, class design, programming concepts
+    36: "Python Function Development",             # Custom Python function creation
+    37: "Comedic & Vivid Storytelling",           # Comedy, detailed creative descriptions
+    38: "Security & Privacy Protection",           # Cybersecurity, information protection
+    39: "Jamie Character Problems",                # Math and scenarios with Jamie character
+    40: "Word Analysis & English Linguistics",     # Word processing, English language analysis
+    41: "Educational & School Mathematics",        # Student problems, classroom scenarios
+    42: "Graph Theory & Network Analysis",         # Network graphs, connections, influence
+    43: "Mathematical Optimization & Min/Max",     # Optimization problems, extrema
+    44: "Logical Premise Evaluation & Testing",    # Premise-conclusion validation
+    45: "Calendar & Time Management",              # Scheduling, time calculations
+    46: "Growth Models & Population Dynamics",     # Population growth, differential equations
+    47: "Number Theory & Combinatorics",          # Number properties, counting problems
+    48: "Alex Time & Duration Calculations",       # Time-based problems with Alex
+    49: "Group Organization & Event Planning",     # Social organization, group management
+    50: "Set Theory & Mathematical Sets",          # Set operations, mathematical collections
+    51: "Emily Daily Life & Simple Math",          # Basic problems with Emily character
+    52: "Cyrillic Script Mixed Content",           # Russian/Ukrainian mixed topics
+    53: "Area & Geometric Measurements",           # Geometric calculations, measurements
+    54: "Age & Temporal Relationships",            # Age problems, time-related calculations
+    55: "Python Code Debugging & Analysis",        # Code review, error correction
+    56: "General Q&A & Information Requests",      # Broad knowledge questions
+    57: "Python Function Design & Implementation", # Function development, averaging
+    58: "Counting & Simple Arithmetic",            # Basic counting, simple math
+    59: "Probability & Statistical Analysis",      # Statistics, probability distributions
+    60: "Coordinate Geometry & Points",            # Point geometry, coordinate systems
+    61: "Spanish Mixed Language Content",          # Spanish with other language elements
+    62: "AI Character & World Building",           # AI discussions, character creation
+    63: "Cyrillic Technical & Algorithm Content",  # Russian/Ukrainian technical material
+    64: "Python Error Handling & Debugging",       # Code debugging, error correction
+    65: "Python Dictionary & Key-Value Operations", # Dictionary processing, data structures
+    66: "World Building & Creative Generation",     # Creative content, world creation
+    67: "Books & Reading Management",               # Book-related problems, reading tasks
+    68: "String Character & Text Manipulation",    # Character-level string processing
+    69: "City Travel & Transportation",             # Travel problems, city navigation
+    70: "Technical Help & Programming Assistance", # Technical support, programming help
+    71: "Health Information & Detailed Instructions", # Health advice, comprehensive explanations
+    72: "Translation & Language Conversion",       # Language translation, conversion tasks
+    73: "List Processing & Task Completion",       # List operations, task instructions
+    74: "Task Classification & Answer Validation", # Task-based questions, answer checking
+    75: "Cost Analysis & Budget Calculations",     # Financial calculations, cost analysis
+    76: "Sentence Logic & Common Sense Testing",   # Sentence evaluation, logical reasoning
+    77: "Varied Conversation & Mixed Topics",      # Diverse conversations, mixed subjects
+    78: "Speed & Distance Calculations",           # Transportation math, speed problems
+    79: "Tamil Language Content",                  # Tamil script and language
+    80: "Business Cost & Revenue Management",      # Business mathematics, financial planning
+    81: "Structured Response & List Formatting",   # Formatted responses, bullet points
+    82: "Spanish Language Content",                # Spanish text and conversations
+    83: "Mathematical Growth & Rate Functions",    # Growth models, rate calculations
+    84: "AI Ethics & Programming Philosophy",      # AI development ethics, programming concepts
+    85: "Function Processing & Data Handling",     # Function operations, data management
+    86: "Program Design & Software Development",   # Software creation, program architecture
+    87: "Document Processing & Legal Text",        # Document analysis, legal content
+    88: "Content Classification & Categories",     # Classification tasks, category assignment
+    89: "Integer Operations & Digit Mathematics",  # Number operations, digit manipulation
+    90: "File Processing & Script Development",    # File handling, script creation
+    91: "Mathematical Arrays & Calculations",      # Array mathematics, numerical operations
+    92: "Time Duration & Activity Scheduling",     # Time management, activity planning
+    93: "Response Structure & Content Creation",   # Response formatting, content generation
+    94: "Music & Entertainment Industry",          # Music, songs, entertainment content
+    95: "Word Problems & Calculation Tasks",       # Word-based math, calculation problems
+    96: "Spanish & Chinese Mixed Languages",       # Multilingual content mixing
+    97: "Simple Greetings & Basic Interactions",   # Basic conversations, simple responses
+    98: "Task Processing & PersonX References",    # Specific task formats, structured tasks
+    99: "Algorithm Performance & Optimization",    # Algorithm analysis, performance metrics
+    100: "Polynomial Equations & Mathematical Solving", # Equation solving, polynomial math
+    101: "SQL Database & Query Operations",        # Database management, SQL queries
+    102: "Medical Research & Structured Data",     # Medical content, JSON processing
+    103: "Prime Numbers & Mathematical Algorithms", # Prime number theory, mathematical proofs
+    104: "Health & Mental Wellness Information",   # Health advice, mental health topics
+    105: "Weekly Scheduling & Training Programs",  # Weekly planning, training schedules
+    106: "Quantum Physics & Advanced Computing",   # Quantum mechanics, advanced concepts
+    107: "Library & Book Collection Management",   # Book organization, library systems
+    108: "Binary Questions & Claim Verification",  # Yes/No questions, fact checking
+    109: "Physics Measurements & Calculations",    # Physics problems, measurement tasks
+    110: "Team Sports & Gaming Statistics",        # Sports teams, game analysis
+    111: "Data Processing & Structure Analysis",   # Data analysis, structural processing
+    112: "Community Management & Social Groups",   # People management, social organization
+    113: "Arabic Language & Middle Eastern Content", # Arabic script and language
+    114: "Character Development & Story Creation",  # Story characters, narrative building
+    115: "Advanced Mathematics & Mixed Languages",  # Complex math with language mixing
+    116: "European Romance Languages",             # French, Italian, Portuguese mix
+    117: "Counting Problems & Numerical Reasoning", # Numerical counting, reasoning tasks
+    118: "Advanced Calculus & Complex Functions",  # Complex mathematical analysis
+    119: "SVG Graphics & Web Development",         # SVG code, graphics programming
+    120: "Creative Projects & Harmful Content",    # Creative content with potential issues
+    121: "Population Studies & Growth Analysis",   # Population dynamics, demographic studies
+    122: "Annual Calculations & Time Periods",     # Yearly data, time-based analysis
+    123: "Database Security & System Management",  # Database operations, security systems
+    124: "Product Reviews & Sentiment Analysis",   # Review processing, sentiment evaluation
+    125: "Time Tracking & Hour Management",        # Time calculations, hour tracking
+    126: "Trigonometry & Complex Mathematics",     # Trigonometric functions, advanced math
+    127: "Geometric Shapes & Drawing Problems"     # Geometry, shape calculations
+},
+custom_colors = {
+    i: f'#{i*255//127:02x}{(i*3)%255:02x}{(i*7)%255:02x}' for i in range(128)
 }
-
 }
