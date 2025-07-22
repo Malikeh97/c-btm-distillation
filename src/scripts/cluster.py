@@ -312,7 +312,7 @@ def create_multi_config_dataset_card(repo_name, config_info, source_dataset):
 license: apache-2.0
 task_categories:
 - text-generation
-- instruction-tuning
+
 language:
 - en
 tags:
@@ -531,14 +531,38 @@ if __name__ == '__main__':
     # Define cluster-to-domain mapping
     # TODO: Update this mapping based on your manual cluster analysis
     cluster_names_mapping = {
-    0: "Programming & Code Development",     # Python functions, arrays, string manipulation, data processing
-    1: "Q&A & Logical Reasoning",          # Multiple choice questions, premise-hypothesis evaluation, logical reasoning
-    2: "Creative Writing & General Tasks",  # Story writing, critiques, analysis tasks, general assistance
-    3: "Multilingual & Translation",       # Non-English content, language identification, translation tasks
-    4: "Safety & Harmful Content",         # Safety-related prompts, harmful requests, hypothetical scenarios
-    5: "Word Problems & Arithmetic",       # Story-based math problems, cost calculations, practical scenarios
-    6: "Non-English Mathematics",          # Mathematical content in non-Latin scripts (Tamil, Russian, etc.)
-    7: "Advanced Mathematics & Modeling"   # Complex mathematical problems, optimization, quantitative analysis
+        0: "Python List & Dictionary Processing",     # Python functions for lists, dictionaries, data processing
+        1: "Reasoning & Multiple Choice Questions",   # Logic tasks, reasoning, step-by-step explanations
+        2: "Creative Writing & Storytelling",        # Short stories, creative narratives, dialogue
+        3: "Language Identification & Sentence Tasks", # Language detection, sentence analysis, translation
+        4: "Product Reviews & Mixed Content",         # Reviews, general assistance, varied topics
+        5: "Named Character Math Problems",           # Math problems featuring Alex, Jamie, etc.
+        6: "Cyrillic & Non-Latin Scripts",           # Russian, Ukrainian, Punjabi, other scripts
+        7: "Number Theory & Combinatorics",          # Prime numbers, digits, mathematical sequences
+        8: "Spanish & Romance Languages",            # Spanish, Portuguese, French content
+        9: "Social Media & Hypothetical Scenarios",  # AI discussions, social narratives, creative prompts
+        10: "Business & Financial Analysis",         # Revenue, growth, company analysis
+        11: "Educational & Group Scenarios",         # Students, classes, educational contexts
+        12: "Sports & Gaming Statistics",            # Team scores, game probabilities, sports math
+        13: "Tamil & Sinhala Scripts",              # Tamil and Sinhala language content
+        14: "Mathematical Sequences & Algorithms",   # Number sequences, prime algorithms, mathematical proofs
+        15: "Detailed Instructions & Formatting",    # Structured responses, bullet points, formatting
+        16: "Time & Duration Calculations",          # Hours, days, time-based problems
+        17: "String Manipulation & Text Processing", # Word processing, character manipulation
+        18: "Array Programming & Code Debugging",    # Array operations, code analysis, debugging
+        19: "Translation & Short Phrases",           # Brief translations, simple language tasks
+        20: "Advanced Calculus & Trigonometry",      # Complex mathematical functions, calculus
+        21: "Indonesian & African Languages",        # Indonesian, Yoruba, African languages
+        22: "Simple Arithmetic Word Problems",       # Basic math with named characters (Emily, Olivia)
+        23: "Data Science & Machine Learning",       # ML models, datasets, statistical analysis
+        24: "Geometry & Area Calculations",          # Geometric shapes, area, spatial problems
+        25: "Graph Theory & Network Analysis",       # Networks, matrices, complex mathematical modeling
+        26: "Database & SQL Operations",             # SQL queries, database management
+        27: "Classification & Harmful Content",      # Content classification, inappropriate requests
+        28: "Cost & Budget Calculations",            # Price calculations, budget planning
+        29: "Differential Equations & Growth Models", # Complex mathematical modeling, growth functions
+        30: "Premise-Hypothesis Evaluation",         # Logical premise testing, hypothesis validation
+        31: "Security & Health Information"          # Cybersecurity, health advice, safety topics
     }
     
     print(f"\n🏷️ Domain Mapping:")
