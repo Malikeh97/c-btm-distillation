@@ -40,7 +40,7 @@ DATASET="allenai/tulu-3-sft-mixture"
 NUM_CLUSTER=8
 HF_USERNAME="Malikeh1375"
 REPO_NAME="clustered_tulu_3"
-SAMPLE_SIZE=1000
+SAMPLE_SIZE=10000
 MODLE_PATH="$SCRATCH/clusters/allenai/tulu-3-sft-mixture/$NUM_CLUSTER"
 TEST_SIZE=0.2
 
@@ -51,10 +51,10 @@ TEST_SIZE=0.2
 echo "Running clustering with ${NUM_CLUSTERS} clusters on ${SAMPLE_SIZE} samples..."
 python -u -m cluster \
   --dataset-name "${DATASET}" \
-  --vectorizer-path "${MODEL_PATH}/tfidf.pkl" \
+  --vectorizer-path "${MODLE_PATH}/tfidf.pkl" \
   --kmeans-path "${MODLE_PATH}/kmeans.pkl" \
   --hf-username "${HF_USERNAME}" \
-  --repo-name "${REPO_NAME}" \
+  --repo-name "${REPO_NAME}_${NUM_CLUSTER}" \
   --sample-size "${SAMPLE_SIZE}" \
   --test-size "${TEST_SIZE}"\
   --output-dir "${MODEL_PATH}" \

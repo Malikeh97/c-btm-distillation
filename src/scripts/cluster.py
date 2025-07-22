@@ -16,13 +16,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
+from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, IterableDataset
 from tqdm.auto import tqdm
 from typing import Dict
 from kmeans_pytorch import KMeans as BalancedKMeans
-from datasets import load_dataset, Dataset, DatasetDict
-from huggingface_hub import HfApi
-from sklearn.model_selection import train_test_split
+from datasets import load_dataset
 
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
@@ -30,6 +29,7 @@ from sklearn.metrics import silhouette_score
 from sklearn.metrics import davies_bouldin_score
 from umap import UMAP
 import seaborn as sns
+
 
 
 def set_random_seeds(seed=42):
@@ -43,6 +43,22 @@ def set_random_seeds(seed=42):
 # Call before training
 set_random_seeds(42)
 
+
+def number_normalizer(tokens):
+    """Map all numeric tokens to a placeholder.
+
+    For many applications, tokens that begin with a number are not directly
+    useful, but the fact that such a token exists can be relevant.  By applying
+    this form of dimensionality reduction, some methods may perform better.
+    """
+    return ("#NUMBER" if token[0].isdigit() else token for token in tokens)
+
+
+class NumberNormalizingVectorizer(TfidfVectorizer):
+    # this vectorizer replaces numbers with #NUMBER token
+    def build_tokenizer(self):
+        tokenize = super().build_tokenizer()
+        return lambda doc: list(number_normalizer(tokenize(doc)))
 
 def load_model(path_to_model: Path):
     """Load pickled model from file"""
@@ -167,8 +183,7 @@ def create_multi_config_dataset_and_upload(
         train_data, test_data = train_test_split(
             clean_cluster_data, 
             test_size=test_size, 
-            random_state=random_state,
-            stratify=cluster_data['source'] if len(cluster_data['source'].unique()) > 1 else None
+            random_state=random_state
         )
         
         print(f"  📦 Train: {len(train_data)} samples")
@@ -514,19 +529,14 @@ if __name__ == '__main__':
     # Define cluster-to-domain mapping
     # TODO: Update this mapping based on your manual cluster analysis
     cluster_names_mapping = {
-        0: "Knowledge & Instruction Following",
-        1: "General Mixed Tasks", 
-        2: "Math & Computation",
-        3: "Knowledge & Reasoning",
-        4: "Coding & Programming", 
-        5: "Knowledge Multilingual",
-        # Add more mappings as needed based on your cluster analysis
-        # Example of more specific domains:
-        # 6: "Creative Writing",
-        # 7: "Data Analysis", 
-        # 8: "Technical Documentation",
-        # 9: "Language Translation",
-        # 10: "Question Answering"
+        0: "Programming & Code Development",     # Python functions, arrays, string manipulation, data processing
+        1: "Q&A & Logical Reasoning",          # Multiple choice questions, premise-hypothesis evaluation, logical reasoning
+        2: "Creative Writing & General Tasks",  # Story writing, critiques, analysis tasks, general assistance
+        3: "Multilingual & Translation",       # Non-English content, language identification, translation tasks
+        4: "Safety & Harmful Content",         # Safety-related prompts, harmful requests, hypothetical scenarios
+        5: "Word Problems & Arithmetic",       # Story-based math problems, cost calculations, practical scenarios
+        6: "Non-English Mathematics",          # Mathematical content in non-Latin scripts (Tamil, Russian, etc.)
+        7: "Advanced Mathematics & Modeling"   # Complex mathematical problems, optimization, quantitative analysis
     }
     
     print(f"\n🏷️ Domain Mapping:")
