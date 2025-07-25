@@ -6,11 +6,11 @@
 #SBATCH --partition=gpubase_l40s_b3
 #SBATCH --gres=gpu:l40s:2
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=16GB
+#SBATCH --mem=128GB
 #SBATCH --account=aip-craffel
 #SBATCH --time=23:00:00
 
-# srun -c 4 --gres=gpu:2 --partition l40 --mem=10GB --pty --time=16:00:00 bash
+# srun -c 4 --gres=gpu:2 --partition l40 --mem=128GB --pty --time=16:00:00 bash
 
 echo "Job ${SLURM_JOB_NAME} (${SLURM_JOB_ID}) started at $(date)"
 echo "Running on node: $(hostname)"
@@ -24,7 +24,8 @@ source /home/ehghaghi/projects/aip-craffel/ehghaghi/c-btm-distillation/uv-x86_64
 
 # Export cache dirs
 export SCRATCH="/home/ehghaghi/scratch/ehghaghi"
-export OUTPUT_DIR=$SCRATCH/distillation_results
+export N_CLUSTERS=8
+export OUTPUT_DIR=$SCRATCH/distillation_results/$N_CLUSTERS
 export HUGGINGFACE_HUB_CACHE=$SCRATCH/.cache
 export WANDB_DIR="$SCRATCH/wandb"
 export TMPDIR="$SCRATCH/tmp"

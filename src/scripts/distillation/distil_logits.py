@@ -15,12 +15,12 @@ config = {
         "name": "Malikeh1375/clustered_tulu_3_8",
         "config_name": "programming_and_code_development",
         "split": "train",
-        "num_samples": 100, # You can pass a number here to limit the number of samples to use.
+        "num_samples": 30000, # You can pass a number here to limit the number of samples to use.
         "seed": 1997
     },
     "models": {
         "teacher": "Qwen/Qwen2.5-7B-Instruct",
-        "student": "Qwen/Qwen2.5-1.5B-Instruct"
+        "student": "Qwen/Qwen2.5-0.5B-Instruct"
     },
     "tokenizer": {
         "max_length": 4096,
@@ -28,10 +28,10 @@ config = {
     },
     "training": {
         "output_dir": "./results",
-        "num_train_epochs": 3,
+        "num_train_epochs": 1,
         "per_device_train_batch_size": 1,
-        "gradient_accumulation_steps": 8,
-        "save_steps": 1000,
+        "gradient_accumulation_steps": 16,
+        "save_steps": 250,
         "logging_steps": 1,
         "learning_rate": 2e-5,
         "weight_decay": 0.05,
@@ -39,7 +39,18 @@ config = {
         "lr_scheduler_type": "cosine",
         "resume_from_checkpoint": None,  # Set to a path or True to resume from the latest checkpoint
         "fp16": False,
-        "bf16": True
+        "bf16": True,
+        # ADD THESE EVALUATION PARAMETERS
+       # ADD THESE EVALUATION PARAMETERS
+        "eval_strategy": "steps",  # or "epoch" (updated parameter name)
+        "eval_steps": 50,  # Evaluate every 500 steps
+        "per_device_eval_batch_size": 1,
+        "dataloader_num_workers": 2,  # Reduce from 4 to 0
+        # Remove include_for_metrics entirely for now to avoid compatibility issues
+        "metric_for_best_model": "eval_loss",
+        "greater_is_better": False,
+        "load_best_model_at_end": True,
+        "save_total_limit": 2,
     },
     "distillation": {
         "temperature": 2.0,
@@ -137,6 +148,17 @@ def pad_logits(student_logits, teacher_logits):
     return student_logits, teacher_logits
 
 class LogitsTrainer(SFTTrainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_evaluating = False
+        # Store losses for averaging during evaluation
+        self.eval_ce_losses = []
+        self.eval_kl_losses = []
+        # Add timing
+        import time
+        self.step_start_time = time.time()
+        self.training_start_time = time.time()
+        
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         device = next(model.parameters()).device
         inputs = {k: v.to(device) if hasattr(v, 'to') else v for k, v in inputs.items()}
@@ -149,7 +171,30 @@ class LogitsTrainer(SFTTrainer):
         with torch.no_grad():
             teacher_outputs = teacher_model(**inputs)
 
-        custom_loss = self.distillation_loss(model, student_outputs.logits, teacher_outputs.logits, inputs, student_outputs.loss)
+        custom_loss, ce_loss, kl_loss = self.distillation_loss(model, student_outputs.logits, teacher_outputs.logits, inputs, student_outputs.loss)
+        
+        # Log individual losses during training
+        if not self.is_evaluating:
+            if hasattr(self, 'log') and self.state.global_step % self.args.logging_steps == 0:
+                import time
+                current_time = time.time()
+                step_duration = current_time - self.step_start_time
+                total_elapsed = current_time - self.training_start_time
+                
+                self.log({
+                    "train/cross_entropy_loss": ce_loss.item(),
+                    "train/kl_divergence_loss": kl_loss.item(),
+                    "train/combined_loss": custom_loss.item(),
+                    "train/step_duration_seconds": step_duration,
+                    "train/total_elapsed_hours": total_elapsed / 3600,
+                    "train/steps_per_hour": self.state.global_step / (total_elapsed / 3600) if total_elapsed > 0 else 0,
+                })
+                self.step_start_time = current_time
+        else:
+            # Store losses for evaluation averaging
+            self.eval_ce_losses.append(ce_loss.item())
+            self.eval_kl_losses.append(kl_loss.item())
+        
         return (custom_loss, student_outputs) if return_outputs else custom_loss
 
     def distillation_loss(self, model, student_logits, teacher_logits, inputs, original_loss):
@@ -165,7 +210,41 @@ class LogitsTrainer(SFTTrainer):
             reduction='batchmean'
         ) * (config["distillation"]["temperature"] ** 2) / config["tokenizer"]["max_length"]
 
-        return config["distillation"]["alpha"] * loss_kd + (1 - config["distillation"]["alpha"]) * original_loss
+        ce_loss = original_loss
+        kl_loss = loss_kd
+        total_loss = config["distillation"]["alpha"] * kl_loss + (1 - config["distillation"]["alpha"]) * ce_loss
+        
+        return total_loss, ce_loss, kl_loss
+
+    def evaluation_loop(self, dataloader, description, prediction_loss_only=None, ignore_keys=None, metric_key_prefix="eval"):
+        """Override evaluation loop to set evaluation flag and log metrics"""
+        self.is_evaluating = True
+        self.eval_ce_losses = []
+        self.eval_kl_losses = []
+        
+        result = super().evaluation_loop(dataloader, description, prediction_loss_only, ignore_keys, metric_key_prefix)
+        
+        # Log averaged evaluation metrics
+        if self.eval_ce_losses and self.eval_kl_losses:
+            avg_ce_loss = sum(self.eval_ce_losses) / len(self.eval_ce_losses)
+            avg_kl_loss = sum(self.eval_kl_losses) / len(self.eval_kl_losses)
+            
+            if hasattr(self, 'log'):
+                self.log({
+                    "eval/cross_entropy_loss": avg_ce_loss,
+                    "eval/kl_divergence_loss": avg_kl_loss,
+                    "eval/combined_loss": config["distillation"]["alpha"] * avg_kl_loss + (1 - config["distillation"]["alpha"]) * avg_ce_loss,
+                })
+        
+        self.is_evaluating = False
+        return result
+
+    # def compute_metrics(self, eval_pred):
+    #     """
+    #     Compute additional metrics during evaluation
+    #     """
+    #     # Return empty dict as individual losses are logged in evaluation_loop
+    #     return {}
 
 # Training arguments
 training_arguments = TrainingArguments(**config["training"])
