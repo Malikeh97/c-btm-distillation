@@ -22,8 +22,18 @@ echo "GPU resources: $CUDA_VISIBLE_DEVICES"
 module load cuda/12.6
 module load gcc arrow/19.0.1 python/3.11
 
+# Check what's loaded
+echo "Loaded modules:"
+module list
+
 # Activate your Python environment
 source /home/ehghaghi/projects/aip-craffel/ehghaghi/c-btm-distillation/uv-x86_64-unknown-linux-gnu/.venv/bin/activate
+
+# Verify Python environment
+echo "Python path: $(which python)"
+echo "Testing numpy import..."
+python -c "import numpy; print(f'numpy {numpy.__version__} works!')" || echo "numpy failed!"
+
 
 # ----------------------------
 # Environment variables
@@ -37,7 +47,7 @@ export OUTPUT_DIR="$SCRATCH/results"
 # Experiment variables
 # ----------------------------
 
-NUM_CLUSTERS=6
+NUM_CLUSTERS=128
 DATASET="allenai/tulu-3-sft-mixture"
 SAMPLE_SIZE=10000
 KMEANS_DIR="$SCRATCH/clusters"

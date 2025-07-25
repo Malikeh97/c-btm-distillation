@@ -37,7 +37,7 @@ export OUTPUT_DIR="$SCRATCH/results"
 # Experiment variables
 # ----------------------------
 DATASET="allenai/tulu-3-sft-mixture"
-NUM_CLUSTER=8
+NUM_CLUSTER=64
 HF_USERNAME="Malikeh1375"
 REPO_NAME="clustered_tulu_3"
 SAMPLE_SIZE=939343 #FULL DATASET

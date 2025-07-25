@@ -298,6 +298,30 @@ def create_multi_config_dataset_and_upload(
     return config_info
 
 
+def generate_yaml_configs(config_info):
+    """
+    Generate the YAML configuration section for the metadata
+    
+    Args:
+        config_info (list): List of configuration dictionaries
+        
+    Returns:
+        str: YAML configuration section
+    """
+    yaml_configs = "configs:\n"
+    
+    for config in config_info:
+        config_name = config['config_name']
+        yaml_configs += f"""  - config_name: {config_name}
+    data_files:
+      - split: train
+        path: "{config_name}/train*.parquet"
+      - split: test
+        path: "{config_name}/test*.parquet"
+"""
+    
+    return yaml_configs
+
 def create_multi_config_dataset_card(repo_name, config_info, source_dataset):
     """Create a comprehensive dataset card for multi-config dataset"""
     
@@ -307,6 +331,9 @@ def create_multi_config_dataset_card(repo_name, config_info, source_dataset):
     
     # Generate config list for metadata
     config_names = [config['config_name'] for config in config_info]
+
+    # Generate YAML configs section
+    yaml_configs = generate_yaml_configs(config_info)
     
     card = f"""---
 license: apache-2.0
@@ -317,13 +344,12 @@ language:
 - en
 tags:
 - multi-domain
-- instruction-following
 - conversational-ai
 - clustered-data
 size_categories:
 - 10K<n<100K
-configs:
-{chr(10).join(f"- config_name: {name}" for name in config_names)}
+
+{yaml_configs}
 ---
 
 # {repo_name.title().replace('-', ' ')} Multi-Domain Dataset
@@ -531,38 +557,70 @@ if __name__ == '__main__':
     # Define cluster-to-domain mapping
     # TODO: Update this mapping based on your manual cluster analysis
     cluster_names_mapping = {
-        0: "Python List & Dictionary Processing",     # Python functions for lists, dictionaries, data processing
-        1: "Reasoning & Multiple Choice Questions",   # Logic tasks, reasoning, step-by-step explanations
-        2: "Creative Writing & Storytelling",        # Short stories, creative narratives, dialogue
-        3: "Language Identification & Sentence Tasks", # Language detection, sentence analysis, translation
-        4: "Product Reviews & Mixed Content",         # Reviews, general assistance, varied topics
-        5: "Named Character Math Problems",           # Math problems featuring Alex, Jamie, etc.
-        6: "Cyrillic & Non-Latin Scripts",           # Russian, Ukrainian, Punjabi, other scripts
-        7: "Number Theory & Combinatorics",          # Prime numbers, digits, mathematical sequences
-        8: "Spanish & Romance Languages",            # Spanish, Portuguese, French content
-        9: "Social Media & Hypothetical Scenarios",  # AI discussions, social narratives, creative prompts
-        10: "Business & Financial Analysis",         # Revenue, growth, company analysis
-        11: "Educational & Group Scenarios",         # Students, classes, educational contexts
-        12: "Sports & Gaming Statistics",            # Team scores, game probabilities, sports math
-        13: "Tamil & Sinhala Scripts",              # Tamil and Sinhala language content
-        14: "Mathematical Sequences & Algorithms",   # Number sequences, prime algorithms, mathematical proofs
-        15: "Detailed Instructions & Formatting",    # Structured responses, bullet points, formatting
-        16: "Time & Duration Calculations",          # Hours, days, time-based problems
-        17: "String Manipulation & Text Processing", # Word processing, character manipulation
-        18: "Array Programming & Code Debugging",    # Array operations, code analysis, debugging
-        19: "Translation & Short Phrases",           # Brief translations, simple language tasks
-        20: "Advanced Calculus & Trigonometry",      # Complex mathematical functions, calculus
-        21: "Indonesian & African Languages",        # Indonesian, Yoruba, African languages
-        22: "Simple Arithmetic Word Problems",       # Basic math with named characters (Emily, Olivia)
-        23: "Data Science & Machine Learning",       # ML models, datasets, statistical analysis
-        24: "Geometry & Area Calculations",          # Geometric shapes, area, spatial problems
-        25: "Graph Theory & Network Analysis",       # Networks, matrices, complex mathematical modeling
-        26: "Database & SQL Operations",             # SQL queries, database management
-        27: "Classification & Harmful Content",      # Content classification, inappropriate requests
-        28: "Cost & Budget Calculations",            # Price calculations, budget planning
-        29: "Differential Equations & Growth Models", # Complex mathematical modeling, growth functions
-        30: "Premise-Hypothesis Evaluation",         # Logical premise testing, hypothesis validation
-        31: "Security & Health Information"          # Cybersecurity, health advice, safety topics
+    0: "Task Instructions & Chinese Content",        # Task-based instructions with Chinese text
+    1: "Reasoning & Consciousness Questions",        # Logic, reasoning, consciousness exploration
+    2: "Creative Writing & Articles",               # Story writing, blog posts, creative content
+    3: "Translation Tasks",                         # Language translation, Japanese-English
+    4: "General Assistance & Mixed Topics",         # Varied help requests, general questions
+    5: "Alex Character Math Problems",              # Math problems featuring Alex character
+    6: "Cyrillic Text & Algorithms",               # Russian/Ukrainian text, algorithm content
+    7: "Group & Community Management",              # People management, community organization
+    8: "Language Processing & NLP",                 # Language tasks, NLP, text processing
+    9: "Character & Narrative Development",         # Story characters, AI narratives, world-building
+    10: "Business Revenue & Growth",                # Company revenue, business growth analysis
+    11: "Probability & Statistical Models",         # Probability calculations, statistical analysis
+    12: "Sports & Gaming",                          # Team sports, game statistics, player data
+    13: "Tamil & Sinhala Scripts",                  # Tamil and Sinhala language content
+    14: "Prime Numbers & Sequences",                # Prime numbers, Fibonacci, mathematical sequences
+    15: "Content Generation & Health",              # Content creation, health information
+    16: "Time & Duration Problems",                 # Hours, weeks, time calculations
+    17: "String Functions & Text Manipulation",     # String processing, character manipulation
+    18: "Array Operations & Numerical Computing",   # Array functions, numerical operations
+    19: "Malagasy & Misc Languages",               # Malagasy language and other scripts
+    20: "Tax & Policy Analysis",                   # Tax calculations, policy documents
+    21: "Indonesian & African Languages",          # Indonesian, Yoruba, African languages
+    22: "Simple Named Character Problems",         # Basic math with Emily, Olivia characters
+    23: "Machine Learning & AI Models",            # ML models, AI systems, datasets
+    24: "Geometry & Spatial Calculations",         # Area, perimeter, geometric shapes
+    25: "Complex Problem Solving & Budgets",       # Complex word problems, budget optimization
+    26: "Art & Visual Programming",                # SVG, visual art, creative programming
+    27: "Energy & Scientific Applications",        # Solar energy, quantum physics, scientific
+    28: "Advanced Calculus & Trigonometry",        # Complex mathematical functions
+    29: "Trigonometric Functions & Physics",       # Sin, cos, physics equations
+    30: "Romance Languages (European)",            # Spanish, French, Italian, Portuguese
+    31: "Step-by-Step Reasoning",                  # Logical reasoning, premise-hypothesis
+    32: "Database & SQL Operations",               # SQL queries, database management
+    33: "Formatted Writing & Documentation",       # Structured writing, paragraph formatting
+    34: "Medical & Health Research",               # Medical studies, health research, patient data
+    35: "Music & Entertainment",                   # Songs, playlists, music industry
+    36: "Python List Processing",                  # Python list operations, data processing
+    37: "Comedic & Detailed Storytelling",        # Comedy, vivid descriptions, entertainment
+    38: "Security & Privacy",                      # Cybersecurity, privacy protection
+    39: "Social Media & Digital Content",          # Social media posts, digital engagement
+    40: "Word & Text Analysis",                    # Word counting, text analysis, linguistics
+    41: "Educational & School Scenarios",          # Students, teachers, classroom problems
+    42: "Graph Theory & Network Analysis",         # Network graphs, node analysis
+    43: "Mathematical Optimization",               # Min/max problems, optimization
+    44: "Premise-Hypothesis Testing",              # Logical premise evaluation
+    45: "Calendar & Scheduling",                   # Day/date calculations, scheduling
+    46: "Growth Models & Differential Equations",  # Exponential growth, differential equations
+    47: "Combinatorics & Counting Problems",       # Counting, permutations, combinations
+    48: "Books & Reading",                         # Book collections, reading, libraries
+    49: "Travel & Distance Calculations",          # Speed, distance, travel time
+    50: "Cost & Financial Calculations",           # Budget, cost analysis, financial math
+    51: "Sentence Logic & Common Sense",           # Sentence evaluation, logical reasoning
+    52: "Mixed Languages & General Knowledge",      # Various languages, general facts
+    53: "Percentage & Ratio Problems",             # Percentage calculations, ratios
+    54: "Age & Historical Data",                   # Age problems, historical facts
+    55: "Python Code Analysis & Debugging",        # Code review, debugging, error fixing
+    56: "Product Reviews & Sentiment",             # Product reviews, sentiment analysis
+    57: "Python Function Development",             # Custom Python function creation
+    58: "Short Questions & Simple Translations",   # Brief questions, simple translations
+    59: "Data Science & Big Data",                 # Data processing, big data analytics
+    60: "Geometric Shapes & Drawing",              # Points, lines, geometric drawing
+    61: "Spanish & Portuguese Content",            # Spanish and Portuguese text
+    62: "Detailed Instructions & Explanations",    # Comprehensive explanations, detailed responses
+    63: "Program Development & Design"             # Software development, program design
     }
     
     print(f"\n🏷️ Domain Mapping:")
