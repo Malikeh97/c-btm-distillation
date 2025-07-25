@@ -37,9 +37,9 @@ export OUTPUT_DIR="$SCRATCH/results"
 # Experiment variables
 # ----------------------------
 
-NUM_CLUSTERS=50
+NUM_CLUSTERS=1
 DATASET="allenai/tulu-3-sft-mixture"
-SAMPLE_SIZE=917
+SAMPLE_SIZE=10000
 KMEANS_DIR="$SCRATCH/clusters"
 
 # ----------------------------

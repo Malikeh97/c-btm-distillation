@@ -708,25 +708,167 @@ if __name__ == '__main__':
     analyze_cluster_samples(metadata, 5)
 
     # # Visualize the clusters
-    visualize_clusters_2d(vecs, metadata["cluster"], args.num_clusters, args.output_dir, method='tsne')
+    # visualize_clusters_2d(vecs, metadata["cluster"], args.num_clusters, args.output_dir, method='tsne')
 
     # # Custom mapping
     # cluster_names = {
-    #     0: "Knowledge & Instruction Following",  # write, provide, detailed content
-    #     1: "General Mixed Tasks",                 # mixed topics, doesn't fit core categories well
-    #     2: "Math",                               # number, equation, function, mathematical problems  
-    #     3: "Knowledge & Reasoning",              # answer, question, reasoning tasks
-    #     4: "Coding",                            # python, function, code, programming tasks
-    #     5: "Knowledge (Multilingual)"           # foreign languages, knowledge in other languages
+    #     0: "Task Definition & Language Processing",     # Task instructions, language identification
+    #     1: "Reasoning & Stream of Consciousness",       # Logic, reasoning, step-by-step explanations
+    #     2: "Short Story & Creative Writing",            # Creative narratives, short stories
+    #     3: "Translation Tasks & Language Pairs",        # Translation between specific languages
+    #     4: "Casual Conversation & Mixed Topics",        # General chat, varied discussions
+    #     5: "Alex Character Math & Scenarios",           # Math problems featuring Alex
+    #     6: "Malagasy Language Content",                 # Specific to Malagasy language
+    #     7: "Social Media & Digital Engagement",         # Social media posts, digital content
+    #     8: "Language Identification Tasks",             # Detecting languages, NLP tasks
+    #     9: "Blog Posts & Article Writing",              # Blog writing, article creation
+    #     10: "Business Revenue & Tax Analysis",          # Company finances, tax calculations
+    #     11: "Matrix & Vector Mathematics",              # Linear algebra, mathematical modeling
+    #     12: "Performance Scoring & Analytics",          # Score analysis, performance metrics
+    #     13: "Sinhala Language Content",                 # Sinhala script and language
+    #     14: "Mathematical Sequences & Series",          # Fibonacci, arithmetic sequences
+    #     15: "General Information & Assistance",         # Broad help requests
+    #     16: "Solar Energy & Scientific Applications",   # Energy calculations, scientific problems
+    #     17: "String Processing Functions",              # String manipulation in Python
+    #     18: "Array Operations & Algorithms",            # Array processing, numerical algorithms
+    #     19: "Italian & Romance Language Mix",           # Italian and related languages
+    #     20: "Differential Equations & Greek Letters",   # Advanced math with Greek symbols
+    #     21: "Indonesian & Malay Languages",             # Indonesian, Malaysian content
+    #     22: "Emily Character Simple Math",              # Basic math with Emily character
+    #     23: "Machine Learning & AI Development",        # ML models, AI systems
+    #     24: "Geometry & Area Calculations",             # Geometric shapes, measurements
+    #     25: "Etsy Titles & Art Descriptions",           # Product titles, art descriptions
+    #     26: "Python Dictionary & List Operations",      # Python data structures
+    #     27: "Budget Optimization & Problem Solving",    # Financial optimization, complex problems
+    #     28: "Historical Events & Questions",            # History-related queries
+    #     29: "Advanced Mathematical Functions",          # Complex trigonometry, advanced math
+    #     30: "Premise-Hypothesis Logic Tests",           # Logical reasoning, hypothesis testing
+    #     31: "Step-by-Step Reasoning Processes",         # Detailed logical explanations
+    #     32: "Content Generation & Miscellaneous",       # General content creation
+    #     33: "Paragraph Writing & Formatting",           # Structured writing, formatting
+    #     34: "Non-English Script Mixed Content",         # Various non-Latin scripts
+    #     35: "Programming Class Design",                 # Object-oriented programming
+    #     36: "Python Function & List Processing",        # Python function development
+    #     37: "Comedic & Vivid Storytelling",            # Comedy, detailed descriptions
+    #     38: "Security & Information Protection",        # Cybersecurity, privacy
+    #     39: "Jamie Character & Entertainment",          # Problems with Jamie character
+    #     40: "Word Analysis & English Linguistics",      # Word processing, English language
+    #     41: "Educational & School Mathematics",         # Student problems, classroom scenarios
+    #     42: "Graph Theory & Network Analysis",          # Network graphs, connections
+    #     43: "Mathematical Optimization Problems",       # Min/max problems, optimization
+    #     44: "Logical Premise Evaluation",              # Premise-conclusion testing
+    #     45: "Calendar & Daily Scheduling",             # Time management, scheduling
+    #     46: "Growth Models & Differential Equations",   # Population growth, differential math
+    #     47: "Number Theory & Digit Problems",          # Number properties, combinatorics
+    #     48: "Alex Time & Duration Problems",           # Time calculations with Alex
+    #     49: "Group Events & Social Organization",       # Event planning, group management
+    #     50: "Set Theory & Mathematical Sets",          # Set operations, mathematical sets
+    #     51: "Emily Daily Life Problems",               # Simple problems with Emily
+    #     52: "Cyrillic Mixed Content",                  # Russian/Ukrainian mixed content
+    #     53: "Area & Measurement Calculations",         # Geometric measurements
+    #     54: "Age & Time-related Problems",             # Age calculations, temporal problems
+    #     55: "Python Code Debugging & Analysis",        # Code review, error fixing
+    #     56: "Question-Answer General Knowledge",        # Broad Q&A, information queries
+    #     57: "Python Function Development",             # Custom Python function creation
+    #     58: "Cookies & Simple Item Counting",          # Basic counting problems
+    #     59: "Probability & Statistical Analysis",       # Statistics, probability calculations
+    #     60: "Geometric Points & Lines",                # Point geometry, coordinate systems
+    #     61: "Spanish Mixed Content",                   # Spanish language with mixed elements
+    #     62: "AI Character & World Building",           # AI discussions, character development
+    #     63: "Cyrillic Technical Content",              # Russian/Ukrainian technical material
+    #     64: "Python Error Correction",                 # Debugging, error handling
+    #     65: "Python Dictionary Operations",            # Dictionary processing, key-value pairs
+    #     66: "World Building & Content Generation",      # Creative world creation
+    #     67: "Books & Reading Content",                 # Book-related problems, reading
+    #     68: "String Character Manipulation",           # Character-level string processing
+    #     69: "City Travel & Distance Problems",         # Travel calculations, city problems
+    #     70: "General Help & Technology",               # Technical assistance, general help
+    #     71: "Detailed Instructions & Health",          # Comprehensive explanations, health
+    #     72: "Translation & Language Change",           # Translation tasks, language conversion
+    #     73: "List Processing & Task Instructions",     # List operations, task completion
+    #     74: "Task Classification & Q&A",              # Task-based questions, classification
+    #     75: "Cost & Budget Calculations",             # Financial calculations, pricing
+    #     76: "Sentence Logic & Common Sense",          # Sentence evaluation, logical reasoning
+    #     77: "Casual Chat & Varied Topics",            # Informal conversation, mixed subjects
+    #     78: "Travel & Speed Calculations",            # Transportation problems, speed/distance
+    #     79: "Tamil Language Content",                 # Tamil script and language
+    #     80: "Business Cost & Revenue Analysis",       # Business mathematics, cost analysis
+    #     81: "Detailed Response Formatting",           # Structured responses, bullet points
+    #     82: "Spanish Language Content",               # Spanish text and questions
+    #     83: "Mathematical Growth Functions",           # Growth models, rate calculations
+    #     84: "AI & Programming Ethics",                # AI development, programming ethics
+    #     85: "Function & Data Handling",               # Function processing, data management
+    #     86: "Program Design & Development",           # Software development, program creation
+    #     87: "Tax & File Processing",                  # Document processing, legal text
+    #     88: "Film & Company Classification",          # Content classification, categories
+    #     89: "Integer & Digit Operations",             # Number operations, integer math
+    #     90: "File & Script Processing",               # File handling, script development
+    #     91: "Mathematical Calculations & Arrays",     # Mathematical operations, array math
+    #     92: "Time Duration & Scheduling",             # Time calculations, scheduling
+    #     93: "Response Creation & Formatting",         # Response structure, content creation
+    #     94: "Music & Entertainment Content",          # Songs, music industry
+    #     95: "Word & Calculation Problems",            # Word problems, calculation tasks
+    #     96: "Spanish & Chinese Mixed Content",        # Spanish with Chinese elements
+    #     97: "Casual Greetings & Simple Responses",    # Basic interactions, greetings
+    #     98: "Task Processing & PersonX",              # Specific task formats, PersonX references
+    #     99: "Algorithm & Performance Analysis",       # Algorithm complexity, performance
+    #     100: "Polynomial & Equation Solving",         # Mathematical equations, polynomials
+    #     101: "SQL Database Operations",               # Database queries, SQL commands
+    #     102: "Medical Research & JSON Processing",    # Medical abstracts, structured data
+    #     103: "Prime Numbers & Algorithms",            # Prime number algorithms, mathematical proofs
+    #     104: "Health & Mental Wellness",              # Health information, mental health
+    #     105: "Weekly Time & Training Schedules",      # Training programs, weekly planning
+    #     106: "Quantum Physics & Advanced Concepts",   # Quantum computing, theoretical physics
+    #     107: "Books & Library Collections",           # Book management, library systems
+    #     108: "Yes/No Questions & Claims",             # Binary questions, claim verification
+    #     109: "Sports Physics & Measurements",         # Sports calculations, physics problems
+    #     110: "Team Sports & Gaming",                  # Sports teams, game statistics
+    #     111: "Data Structure & Processing",           # Data analysis, structure processing
+    #     112: "Community & Group Management",          # People management, community organization
+    #     113: "Japanese & Miscellaneous Content",      # Japanese language with mixed content
+    #     114: "Character Development & Narratives",    # Story characters, narrative development
+    #     115: "Cyrillic & Advanced Mathematics",       # Russian/Ukrainian with complex math
+    #     116: "Romance Languages (European)",          # French, Italian, Spanish mix
+    #     117: "Counting & Numerical Problems",         # Number counting, numerical reasoning
+    #     118: "Advanced Calculus & Functions",         # Complex mathematical functions
+    #     119: "SVG Graphics & Web Development",        # SVG code, web graphics
+    #     120: "Creative Content & Game Development",   # Creative projects, game design
+    #     121: "Population & Growth Models",            # Population studies, growth analysis
+    #     122: "Annual & Time-based Calculations",      # Yearly calculations, time periods
+    #     123: "Database & Security Systems",           # Database management, security
+    #     124: "Product Reviews & Sentiment",           # Review analysis, product feedback
+    #     125: "Hours & Time Management",               # Time tracking, hour calculations
+    #     126: "Trigonometry & Advanced Math",          # Trigonometric functions, complex math
+    #     127: "Geometric Shapes & Drawing"             # Geometry, shape calculations
     # }
 
     # custom_colors = {
-    #     0: '#FF5733',  # Orange-Red
-    #     1: '#33FF57',  # Green
-    #     2: '#3357FF',  # Blue
-    #     3: '#FF33F1',  # Pink
-    #     4: '#F1FF33',  # Yellow
-    #     5: '#33F1FF'   # Cyan
+    #     0: '#FF5733', 1: '#33FF57', 2: '#F1FF33', 3: '#FF33F1', 4: '#9333FF',
+    #     5: '#33F1FF', 6: '#FF0000', 7: '#0066FF', 8: '#FF6600', 9: '#800080',
+    #     10: '#008000', 11: '#FFD700', 12: '#4B0082', 13: '#8B4513', 14: '#2E8B57',
+    #     15: '#FF69B4', 16: '#DC143C', 17: '#00CED1', 18: '#228B22', 19: '#DA70D6',
+    #     20: '#4169E1', 21: '#CD853F', 22: '#FF1493', 23: '#32CD32', 24: '#FF8C00',
+    #     25: '#6A5ACD', 26: '#20B2AA', 27: '#B22222', 28: '#3CB371', 29: '#8A2BE2',
+    #     30: '#00FF7F', 31: '#DC143C', 32: '#FF4500', 33: '#9370DB', 34: '#00FA9A',
+    #     35: '#FF6347', 36: '#40E0D0', 37: '#EE82EE', 38: '#90EE90', 39: '#F0E68C',
+    #     40: '#DDA0DD', 41: '#98FB98', 42: '#F5DEB3', 43: '#FFB6C1', 44: '#87CEEB',
+    #     45: '#D2B48C', 46: '#778899', 47: '#B0C4DE', 48: '#FFFFE0', 49: '#00FFFF',
+    #     50: '#FAFAD2', 51: '#FFE4E1', 52: '#DCDCDC', 53: '#FDF5E6', 54: '#F0F8FF',
+    #     55: '#F5F5F5', 56: '#FFF8DC', 57: '#FFFACD', 58: '#FDF5E6', 59: '#F0FFFF',
+    #     60: '#F5FFFA', 61: '#FFF5EE', 62: '#F0F0F0', 63: '#FFFAFA', 64: '#F8F8FF',
+    #     65: '#F5F5DC', 66: '#FDF5E6', 67: '#FFFAF0', 68: '#F0FFF0', 69: '#F5FFFA',
+    #     70: '#F0F8FF', 71: '#E6E6FA', 72: '#FFF0F5', 73: '#FFE4E1', 74: '#FFEBCD',
+    #     75: '#FFE4B5', 76: '#FFDEAD', 77: '#F5DEB3', 78: '#DDA0DD', 79: '#DA70D6',
+    #     80: '#FF69B4', 81: '#FF1493', 82: '#DC143C', 83: '#B22222', 84: '#A0522D',
+    #     85: '#8B4513', 86: '#D2691E', 87: '#CD853F', 88: '#F4A460', 89: '#DEB887',
+    #     90: '#D2B48C', 91: '#BC8F8F', 92: '#F0E68C', 93: '#EEE8AA', 94: '#BDB76B',
+    #     95: '#F5DEB3', 96: '#FFE4B5', 97: '#FFDEAD', 98: '#F5DEB3', 99: '#DDA0DD',
+    #     100: '#D8BFD8', 101: '#DDA0DD', 102: '#EE82EE', 103: '#DA70D6', 104: '#FF69B4',
+    #     105: '#FF1493', 106: '#DC143C', 107: '#B22222', 108: '#A0522D', 109: '#8B4513',
+    #     110: '#D2691E', 111: '#CD853F', 112: '#F4A460', 113: '#DEB887', 114: '#D2B48C',
+    #     115: '#BC8F8F', 116: '#F0E68C', 117: '#EEE8AA', 118: '#BDB76B', 119: '#9ACD32',
+    #     120: '#ADFF2F', 121: '#7FFF00', 122: '#7CFC00', 123: '#00FF00', 124: '#32CD32',
+    #     125: '#98FB98', 126: '#90EE90', 127: '#00FA9A'
     # }
 
     # visualize_labeled_clusters_2d(vecs, metadata["cluster"], args.num_clusters, args.output_dir, 
@@ -735,30 +877,30 @@ if __name__ == '__main__':
     #                     cluster_colors=custom_colors)
 
 
-    analyze_elbow_tulu(
-        base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
-         dataset_name='allenai/tulu-3-sft-mixture',
-         sample_size=10000,
-         ks=[2, 4, 6, 8, 10, 12, 14, 16, 18, 19, 20, 25, 30, 35, 40, 45, 50, 75, 100],
-         plot_filename=args.output_dir / 'tulu_elbow_scores.png',
-         save_plot=True)
+    # analyze_elbow_tulu(
+    #     base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
+    #      dataset_name='allenai/tulu-3-sft-mixture',
+    #      sample_size=10000,
+    #      ks=[2, 4, 8, 16, 32, 64, 128],
+    #      plot_filename=args.output_dir / 'tulu_elbow_scores.png',
+    #      save_plot=True)
 
-    analyze_silhouette_tulu(
-        base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
-        dataset_name='allenai/tulu-3-sft-mixture',
-        sample_size=10000,
-        ks=[2, 4, 6, 8, 10, 12, 14, 16, 18, 19, 20, 25, 30, 35, 40, 45, 50, 75, 100],
-        plot_filename=args.output_dir / 'tulu_silhouette_scores.png',
-        save_plot=True)
+    # analyze_silhouette_tulu(
+    #     base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
+    #     dataset_name='allenai/tulu-3-sft-mixture',
+    #     sample_size=10000,
+    #     ks=[2, 4, 8, 16, 32, 64, 128],
+    #     plot_filename=args.output_dir / 'tulu_silhouette_scores.png',
+    #     save_plot=True)
 
 
-    analyze_davies_bouldin_tulu(
-        base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
-         dataset_name='allenai/tulu-3-sft-mixture',
-         sample_size=10000,
-         ks=[2, 4, 6, 8, 10, 12, 14, 16, 18, 19, 20, 25, 30, 35, 40, 45, 50, 75, 100],
-         plot_filename=args.output_dir / 'tulu_davies_bouldin_scores.png',
-         save_plot=True)
+    # analyze_davies_bouldin_tulu(
+    #     base_path='/home/ehghaghi/scratch/ehghaghi/clusters/allenai/tulu-3-sft-mixture',
+    #      dataset_name='allenai/tulu-3-sft-mixture',
+    #      sample_size=10000,
+    #      ks=[2, 4, 8, 16, 32, 64, 128],
+    #      plot_filename=args.output_dir / 'tulu_davies_bouldin_scores.png',
+    #      save_plot=True)
 
 
 
