@@ -13,7 +13,7 @@ config = {
     "project_name": "SLMensembles",
     "dataset": {
         "name": "Malikeh1375/clustered_tulu_3_8",
-        "config_name": "multilingual_and_translation",
+        "config_name": "creative_writing_and_general_tasks",
         "split": "train",
         "num_samples": 15000, # You can pass a number here to limit the number of samples to use.
         "seed": 1997
@@ -43,7 +43,7 @@ config = {
         # ADD THESE EVALUATION PARAMETERS
        # ADD THESE EVALUATION PARAMETERS
         "eval_strategy": "steps",  # or "epoch" (updated parameter name)
-        "eval_steps": 250,  # Evaluate every 500 steps
+        "eval_steps": 50,  
         "per_device_eval_batch_size": 1,
         "dataloader_num_workers": 2, 
         # Remove include_for_metrics entirely for now to avoid compatibility issues
@@ -250,13 +250,13 @@ class LogitsTrainer(SFTTrainer):
         if self.eval_ce_losses and self.eval_kl_losses:
             avg_ce_loss = sum(self.eval_ce_losses) / len(self.eval_ce_losses)
             avg_kl_loss = sum(self.eval_kl_losses) / len(self.eval_kl_losses)
-            
-            if hasattr(self, 'log'):
-                self.log({
-                    "eval/cross_entropy_loss": avg_ce_loss,
-                    "eval/kl_divergence_loss": avg_kl_loss,
-                    "eval/combined_loss": config["distillation"]["alpha"] * avg_kl_loss + (1 - config["distillation"]["alpha"]) * avg_ce_loss,
-                })
+                
+            # Update the result metrics dictionary
+            result.metrics.update({
+                "eval_cross_entropy_loss": avg_ce_loss,  # Note: no "/" in the key
+                "eval_kl_divergence_loss": avg_kl_loss,
+                "eval_combined_loss": config["distillation"]["alpha"] * avg_kl_loss + (1 - config["distillation"]["alpha"]) * avg_ce_loss,
+            })
         
         self.is_evaluating = False
         return result
