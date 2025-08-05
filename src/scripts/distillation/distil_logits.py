@@ -33,7 +33,7 @@ config = {
         "gradient_accumulation_steps": 8,
         "save_steps": 500,
         "logging_steps": 1,
-        "learning_rate": 5e-5,
+        "learning_rate": 2e-5,
         "weight_decay": 0.05,
         "warmup_ratio": 0.1,
         "lr_scheduler_type": "cosine",
@@ -43,7 +43,7 @@ config = {
         # ADD THESE EVALUATION PARAMETERS
        # ADD THESE EVALUATION PARAMETERS
         "eval_strategy": "steps",  # or "epoch" (updated parameter name)
-        "eval_steps": 25,  
+        "eval_steps": 10,
         "per_device_eval_batch_size": 1,
         "dataloader_num_workers": 2, 
         # Remove include_for_metrics entirely for now to avoid compatibility issues
@@ -51,11 +51,11 @@ config = {
         "greater_is_better": False,
         "load_best_model_at_end": True,
         "save_total_limit": 1,
-        "max_grad_norm": 5
+        "max_grad_norm": 1
     },
     "distillation": {
         "temperature": 1.0,
-        "alpha": 0.8,
+        "alpha": 0.5,
         "distillation_type": "forward_kld"  # Added distillation type
     },
     "model_config": {
@@ -559,65 +559,6 @@ class LogitsTrainer(SFTTrainer):
         
         return (custom_loss, student_outputs) if return_outputs else custom_loss
 
-    # def distillation_loss(self, model, student_logits, teacher_logits, inputs, original_loss):
-    #     device = next(model.parameters()).device
-    #     student_logits, teacher_logits = pad_logits(student_logits.to(device), teacher_logits.to(device))
-        
-    #     # Get labels for proper masking
-    #     labels = inputs.get('labels', None)
-        
-    #     if labels is not None:
-    #         # Apply the same masking to logits as used for CE loss
-    #         # Shift logits and labels for next token prediction
-    #         shift_student_logits = student_logits[..., :-1, :].contiguous()
-    #         shift_teacher_logits = teacher_logits[..., :-1, :].contiguous()
-    #         shift_labels = labels[..., 1:].contiguous()
-            
-    #         # Create mask for valid (non-masked) tokens
-    #         valid_mask = (shift_labels != -100).float()
-            
-    #         if valid_mask.sum() > 0:
-    #             # Scale by temperature
-    #             student_logits_scaled = shift_student_logits / config["distillation"]["temperature"]
-    #             teacher_logits_scaled = shift_teacher_logits / config["distillation"]["temperature"]
-                
-    #             # Compute KL divergence following reference implementation
-    #             # Forward KLD: student learns from teacher (original implementation)
-    #             loss_kd = F.kl_div(
-    #                     F.log_softmax(student_logits_scaled, dim=-1),
-    #                     F.log_softmax(teacher_logits_scaled, dim=-1),
-    #                     reduction='none',
-    #                     log_target=True
-    #             ).sum(dim=-1)  # Sum over vocabulary dimension
-                
-    #             # Apply mask and normalize following reference pattern
-    #             loss_kd = (loss_kd * valid_mask).sum() / valid_mask.sum()
-    #             loss_kd = loss_kd * (config["distillation"]["temperature"] ** 2)
-    #         else:
-    #             # No valid tokens to compute KL divergence on
-    #             loss_kd = torch.tensor(0.0, device=device, requires_grad=True)
-    #     else:
-    #         # Fallback: compute KL divergence on all tokens
-    #         student_logits_scaled = student_logits / config["distillation"]["temperature"]
-    #         teacher_logits_scaled = teacher_logits / config["distillation"]["temperature"]
-            
-    #         loss_kd = F.kl_div(
-    #                 F.log_softmax(student_logits_scaled, dim=-1),
-    #                 F.log_softmax(teacher_logits_scaled, dim=-1),
-    #                 reduction='batchmean',
-    #                 log_target=True
-    #             ) * (config["distillation"]["temperature"] ** 2)
-
-    #     ce_loss = original_loss
-    #     kl_loss = loss_kd
-    #     total_loss = (1 - config["distillation"]["alpha"]) * kl_loss + config["distillation"]["alpha"] * ce_loss
-        
-    #     # # Optional debug logging every 50 steps
-    #     # if hasattr(self, 'state') and self.state.global_step % 50 == 0:
-    #     #     print(f"Step {self.state.global_step}: CE={ce_loss:.4f}, KL={kl_loss:.4f}, Combined={total_loss:.4f}")
-        
-    #     return total_loss, ce_loss, kl_loss
-
     def distillation_loss(self, model, student_logits, teacher_logits, inputs, original_loss):
         device = next(model.parameters()).device
         student_logits, teacher_logits = pad_logits(student_logits.to(device), teacher_logits.to(device))
@@ -686,7 +627,7 @@ class LogitsTrainer(SFTTrainer):
             result.metrics.update({
                 "eval_cross_entropy_loss": avg_ce_loss,
                 "eval_kl_divergence_loss": avg_kl_loss,
-                "eval_combined_loss": config["distillation"]["alpha"] * avg_kl_loss + (1 - config["distillation"]["alpha"]) * avg_ce_loss,
+                "eval_combined_loss": (1-config["distillation"]["alpha"]) * avg_kl_loss + config["distillation"]["alpha"] * avg_ce_loss,
             })
         
         self.is_evaluating = False
