@@ -13,7 +13,7 @@ config = {
     "dataset": {
         "name": "Malikeh1375/clustered_tulu_3_8",
         "config_name": "safety_and_harmful_content",
-        "split": "train",
+        "split": "test",
         "num_samples": 3125,
         "seed": 1997,
         "test_split_ratio": 0.8
@@ -369,6 +369,14 @@ def evaluate_model():
         config['models']['trained_model_path'],
         torch_dtype=torch.bfloat16
     )
+
+    # model = AutoModelForCausalLM.from_pretrained(
+    #     "Qwen/Qwen2.5-7B-Instruct",
+    #     torch_dtype=torch.bfloat16,
+    #     device_map="auto",  # Automatically distribute across GPUs
+    #     trust_remote_code=True,  # If model requires custom code
+    #     use_cache=True
+    # )
     
     device = torch.device(config["eval"]["device"])
     model = model.to(device)
